@@ -4,89 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MMM Rules</title>
+  <link rel="stylesheet" href="./css/site.css">
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b0b0b;
-      color: white;
-    }
-
-    .top-nav {
-      background: #111;
-      border-bottom: 1px solid #222;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-
-    .top-nav-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-    }
-
-    .nav-logo {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 20px;
-      letter-spacing: 0.08em;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .nav-links a {
-      color: #ddd;
-      text-decoration: none;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: bold;
-      transition: background 0.2s ease, color 0.2s ease;
-    }
-
-    .nav-links a:hover {
-      background: #1f1f1f;
-      color: white;
-    }
-
-    .nav-links a.active {
-      background: #e10600;
-      color: white;
-    }
-
     #rules-app {
       max-width: 1000px;
       margin: auto;
       padding: 20px;
-    }
-
-    .page-title {
-      font-size: 36px;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-
-    .page-subtitle {
-      color: #999;
-      margin-bottom: 24px;
-    }
-
-    .panel {
-      background: #111;
-      color: white;
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 12px;
     }
 
     .panel h2 {
@@ -112,40 +35,21 @@
     .panel li {
       margin-bottom: 8px;
     }
-
-    .actions {
-      margin-bottom: 20px;
-    }
-
-    .btn {
-      display: inline-block;
-      background: #e10600;
-      color: white;
-      text-decoration: none;
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 14px;
-    }
-
-    .btn.secondary {
-      background: #333;
-    }
   </style>
 </head>
 <body>
- <nav class="top-nav">
+  <nav class="top-nav">
     <div class="top-nav-inner">
       <a href="./" class="nav-logo">MMM</a>
       <div class="nav-links">
         <a href="./" id="nav-home">Home</a>
-        <a href="./results-index.html" id="nav-results">Campaign & Results</a>
+        <a href="./results-index.html" id="nav-results">Results</a>
         <a href="./standings.html" id="nav-standings">Standings</a>
         <a href="./riders.html" id="nav-riders">Riders</a>
         <a href="./rules.html" id="nav-rules">Rules</a>
       </div>
     </div>
- </nav>
+  </nav>
 
   <div id="rules-app">
     <div class="page-title">Rules</div>
@@ -241,5 +145,7 @@
       </p>
     </div>
   </div>
+
+  <script src="./js/site.js"></script>
 </body>
 </html>
