@@ -3,70 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MMM Race Results</title>
+  <title>MMM Standings</title>
   <link rel="stylesheet" href="./css/site.css">
   <style>
-    #results-app {
+    #standings-app {
       max-width: 1400px;
       margin: auto;
       padding: 20px;
     }
 
-    .header-card,
-    .table-wrap {
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    .header-card {
-      background: #111;
-      color: white;
-      border-radius: 14px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    }
-
-    .race-title {
-      font-size: 32px;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-
-    .meta {
-      color: #ccc;
-      margin-bottom: 6px;
-    }
-
-    .detail-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 10px;
-      margin-top: 16px;
-    }
-
-    .detail-card {
-      background: #1b1b1b;
-      border-radius: 8px;
-      padding: 10px 12px;
-    }
-
-    .detail-label {
-      font-size: 12px;
-      color: #aaa;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-
-    .detail-value {
-      font-size: 15px;
-      color: #fff;
-      font-weight: bold;
-    }
-
-    .actions {
+    .tab-bar {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
-      margin-top: 14px;
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      background: #222;
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: #e10600;
+    }
+
+    .table-wrap {
+      padding: 0;
     }
   </style>
 </head>
@@ -84,8 +52,15 @@
     </div>
   </nav>
 
-  <div id="results-app">
-    <div id="headerArea" class="header-card">Loading race...</div>
+  <div id="standings-app">
+    <div class="page-title">Standings</div>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="overall">Overall</button>
+      <button class="tab-btn" data-tab="gc">GC</button>
+      <button class="tab-btn" data-tab="sprint">Sprint</button>
+      <button class="tab-btn" data-tab="kom">KOM</button>
+    </div>
 
     <div class="toolbar">
       <input type="text" id="searchBox" placeholder="Search rider name">
@@ -111,12 +86,16 @@
   <script src="./js/site.js"></script>
 
   <script>
-    let allResults = [];
-    let filtersInitialised = false;
+    let standingsData = {
+      overall: [],
+      gc: [],
+      sprint: [],
+      kom: []
+    };
 
-    function getQueryParam(name) {
-      return new URLSearchParams(window.location.search).get(name);
-    }
+    let currentTab = "overall";
+    let tabsInitialised = false;
+    let filtersInitialised = false;
 
     function getCompetitionClass(value) {
       return String(value) === "Female" ? "comp-female" : "comp-open";
@@ -126,109 +105,91 @@
       return `cat-${String(value || "").trim()}`;
     }
 
-    function safeValue(value) {
-      return value ? value : "-";
+    function getCurrentRows() {
+      return standingsData[currentTab] || [];
     }
 
-    function renderRaceHeader(race) {
-      const header = document.getElementById("headerArea");
+    function getColumnsForTab(tab, rows) {
+      const base = ["Rank", "Name", "Competition", "Cat"];
 
-      if (!race) {
-        header.innerHTML = "Race not found.";
-        return;
+      if (!rows.length) return base;
+
+      const allCols = Object.keys(rows[0]);
+      const raceCols = allCols
+        .filter(c => /^Race \d+$/i.test(c))
+        .sort((a, b) => Number(a.replace("Race ", "")) - Number(b.replace("Race ", "")));
+
+      if (tab === "gc") {
+        return [...base, ...raceCols, "Time", "Time Gap"];
       }
 
-      header.innerHTML = `
-        <div class="race-title">${race["Race Display"] || race["Race Name"] || ""}</div>
-        <div class="meta">Date: ${race["Date"] || ""}</div>
-        <div class="meta">Course: ${race["Course Name"] || ""}</div>
-        <div class="meta">Event ID: ${race["Event ID"] || ""}</div>
+      if (tab === "overall") {
+        return [...base, ...raceCols, "Total Points"];
+      }
 
-        <div class="detail-grid">
-          <div class="detail-card">
-            <div class="detail-label">Type</div>
-            <div class="detail-value">${safeValue(race["Type"])}</div>
-          </div>
-          <div class="detail-card">
-            <div class="detail-label">Laps</div>
-            <div class="detail-value">${safeValue(race["Laps"])}</div>
-          </div>
-          <div class="detail-card">
-            <div class="detail-label">Distance</div>
-            <div class="detail-value">${safeValue(race["Distance"])}</div>
-          </div>
-          <div class="detail-card">
-            <div class="detail-label">Elevation</div>
-            <div class="detail-value">${safeValue(race["Elevation"])}</div>
-          </div>
-          <div class="detail-card">
-            <div class="detail-label">Sprint</div>
-            <div class="detail-value">${safeValue(race["Sprint"])}</div>
-          </div>
-          <div class="detail-card">
-            <div class="detail-label">KQOM</div>
-            <div class="detail-value">${safeValue(race["KQOM"])}</div>
-          </div>
-        </div>
-
-        <div class="actions">
-          ${
-            race["RacePass Link"]
-              ? `<a class="btn" href="${race["RacePass Link"]}" target="_blank" rel="noopener noreferrer">Race Pass</a>`
-              : ""
-          }
-          ${
-            race["Zwiftpower Link"]
-              ? `<a class="btn secondary" href="${race["Zwiftpower Link"]}" target="_blank" rel="noopener noreferrer">ZwiftPower</a>`
-              : ""
-          }
-        </div>
-      `;
+      return [...base, ...raceCols, "Total Points"];
     }
 
-    function renderResultsTable(rows) {
+    function renderTable(rows) {
       const area = document.getElementById("tableArea");
 
       if (!rows.length) {
-        area.innerHTML = `<div class="empty">No results found.</div>`;
+        area.innerHTML = `<div class="empty">No standings found.</div>`;
         return;
       }
+
+      const columns = getColumnsForTab(currentTab, rows);
 
       area.innerHTML = `
         <table>
           <thead>
             <tr>
-              <th class="num">Pos</th>
-              <th>Name</th>
-              <th>Competition</th>
-              <th>Cat</th>
-              <th class="num">Time</th>
-              <th class="num">Finish</th>
-              <th class="num">Sprint</th>
-              <th class="num">KOM</th>
-              <th class="num">Total</th>
+              ${columns.map(col => `
+                <th class="${
+                  col === 'Rank' ||
+                  col === 'Time' ||
+                  col === 'Time Gap' ||
+                  col === 'Total Points' ||
+                  /^Race \\d+$/i.test(col)
+                    ? 'num'
+                    : ''
+                }">${col}</th>
+              `).join("")}
             </tr>
           </thead>
           <tbody>
             ${rows.map(r => `
               <tr>
-                <td class="num">${r["Position"] || ""}</td>
-                <td>${r["Name"] || ""}</td>
-                <td>
-                  <span class="comp-pill ${getCompetitionClass(r["Competition"])}">
-                    ${r["Competition"] || ""}
-                  </span>
-                </td>
-                <td>
-                  <span class="cat-pill ${getCatClass(r["Cat"])}">
-                    ${r["Cat"] || ""}
-                  </span>
-                </td>
-                <td class="num">${r["Time"] || ""}</td>
-                <td class="num">${r["Finish Points"] || 0}</td>
-                <td class="num">${r["Sprint Points"] || 0}</td>
-                <td class="num">${r["KOM Points"] || 0}</td>
-                <td class="num">${r["Pts"] || 0}</td>
+                ${columns.map(col => {
+                  if (col === "Competition") {
+                    return `
+                      <td>
+                        <span class="comp-pill ${getCompetitionClass(r[col])}">
+                          ${r[col] || ""}
+                        </span>
+                      </td>
+                    `;
+                  }
+
+                  if (col === "Cat") {
+                    return `
+                      <td>
+                        <span class="cat-pill ${getCatClass(r[col])}">
+                          ${r[col] || ""}
+                        </span>
+                      </td>
+                    `;
+                  }
+
+                  const numericLike =
+                    col === "Rank" ||
+                    col === "Time" ||
+                    col === "Time Gap" ||
+                    col === "Total Points" ||
+                    /^Race \d+$/i.test(col);
+
+                  return `<td class="${numericLike ? 'num' : ''}">${r[col] || ""}</td>`;
+                }).join("")}
               </tr>
             `).join("")}
           </tbody>
@@ -241,14 +202,28 @@
       const competition = document.getElementById("competitionFilter").value;
       const cat = document.getElementById("catFilter").value;
 
-      const filtered = allResults.filter(row => {
-        const matchesName = !q || String(row["Name"] || "").toLowerCase().includes(q);
-        const matchesCompetition = !competition || String(row["Competition"] || "") === competition;
-        const matchesCat = !cat || String(row["Cat"] || "") === cat;
+      const filtered = getCurrentRows().filter(row => {
+        const matchesName = !q || String(row.Name || "").toLowerCase().includes(q);
+        const matchesCompetition = !competition || String(row.Competition || "") === competition;
+        const matchesCat = !cat || String(row.Cat || "") === cat;
         return matchesName && matchesCompetition && matchesCat;
       });
 
-      renderResultsTable(filtered);
+      renderTable(filtered);
+    }
+
+    function initTabs() {
+      if (tabsInitialised) return;
+      tabsInitialised = true;
+
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentTab = btn.dataset.tab;
+          applyFilters();
+        });
+      });
     }
 
     function initFilters() {
@@ -260,37 +235,35 @@
       document.getElementById("catFilter").addEventListener("change", applyFilters);
     }
 
-    async function loadResultsPage() {
-      const raceNumber = getQueryParam("race");
-
-      if (!raceNumber) {
-        document.getElementById("headerArea").innerHTML = "Missing race parameter.";
-        document.getElementById("tableArea").innerHTML = `<div class="empty">No race selected.</div>`;
-        return;
-      }
-
+    async function loadStandingsPage() {
       try {
-        const data = await api("race-results", { race: raceNumber });
+        const data = await api("standings");
 
         if (!data || data.ok === false) {
-          document.getElementById("headerArea").innerHTML = "Failed to load race.";
-          document.getElementById("tableArea").innerHTML = `<div class="empty">Failed to load results.</div>`;
+          document.getElementById("tableArea").innerHTML =
+            `<div class="empty">Failed to load standings.</div>`;
           console.error(data);
           return;
         }
 
-        renderRaceHeader(data.race || null);
-        allResults = data.results || [];
+        standingsData = {
+          overall: data.overall || [],
+          gc: data.gc || [],
+          sprint: data.sprint || [],
+          kom: data.kom || []
+        };
+
+        initTabs();
         initFilters();
-        renderResultsTable(allResults);
+        renderTable(getCurrentRows());
       } catch (err) {
-        document.getElementById("headerArea").innerHTML = "Failed to load race.";
-        document.getElementById("tableArea").innerHTML = `<div class="empty">Failed to load results.</div>`;
+        document.getElementById("tableArea").innerHTML =
+          `<div class="empty">Failed to load standings.</div>`;
         console.error(err);
       }
     }
 
-    loadResultsPage();
+    loadStandingsPage();
   </script>
 </body>
 </html>
