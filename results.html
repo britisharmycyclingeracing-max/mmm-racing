@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MMM Race Results</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0b0b0b;
+      color: white;
+    }
+
+    .top-nav {
+      background: #111;
+      border-bottom: 1px solid #222;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .top-nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .nav-logo {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 20px;
+      letter-spacing: 0.08em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      color: #ddd;
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      background: #1f1f1f;
+      color: white;
+    }
+
+    .nav-links a.active {
+      background: #e10600;
+      color: white;
+    }
+
+    #results-app {
+      max-width: 1400px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .header-card,
+    .table-wrap {
+      background: #111;
+      color: white;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .race-title {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .meta {
+      color: #ccc;
+      margin-bottom: 6px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .detail-card {
+      background: #1b1b1b;
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .detail-label {
+      font-size: 12px;
+      color: #aaa;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .detail-value {
+      font-size: 15px;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .btn {
+      display: inline-block;
+      background: #e10600;
+      color: white;
+      text-decoration: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .btn.secondary {
+      background: #333;
+    }
+
+    .toolbar {
+      margin-bottom: 16px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar input,
+    .toolbar select {
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      background: white;
+      color: black;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead {
+      background: #1b1b1b;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid #2a2a2a;
+      vertical-align: middle;
+    }
+
+    th {
+      font-weight: bold;
+      color: #ddd;
+      white-space: nowrap;
+    }
+
+    tbody tr:hover {
+      background: #181818;
+    }
+
+    .num {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .comp-pill,
+    .cat-pill {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .comp-open {
+      background: #2b2b2b;
+      color: #fff;
+    }
+
+    .comp-female {
+      background: #4b2a5a;
+      color: #fff;
+    }
+
+    .cat-A { background: #8b1e1e; color: white; }
+    .cat-B { background: #1f5d2f; color: white; }
+    .cat-C { background: #1f4f7a; color: white; }
+    .cat-D { background: #8a6d1d; color: white; }
+    .cat-E { background: #666; color: white; }
+
+    .empty {
+      color: #666;
+      text-align: center;
+      padding: 30px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-nav">
+    <div class="top-nav-inner">
+      <a href="./" class="nav-logo">MMM</a>
+      <div class="nav-links">
+        <a href="./">Home</a>
+        <a href="./results-index.html" class="active">Results</a>
+        <a href="./standings.html">Standings</a>
+        <a href="./riders.html">Riders</a>
+        <a href="./rules.html">Rules</a>
+      </div>
+    </div>
+  </nav>
+
+  <div id="results-app">
+    <div id="headerArea" class="header-card">Loading race...</div>
+
+    <div class="toolbar">
+      <input type="text" id="searchBox" placeholder="Search rider name">
+      <select id="competitionFilter">
+        <option value="">All Competitions</option>
+        <option value="Open">Open</option>
+        <option value="Female">Female</option>
+      </select>
+      <select id="catFilter">
+        <option value="">All Categories</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+        <option value="E">E</option>
+      </select>
+    </div>
+
+    <div id="tableArea" class="table-wrap"></div>
+  </div>
+
+  <script src="./js/config.js"></script>
+
+  <script>
+    let allResults = [];
+
+    function getQueryParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+
+    function getCompetitionClass(value) {
+      return String(value) === "Female" ? "comp-female" : "comp-open";
+    }
+
+    function getCatClass(value) {
+      return `cat-${String(value || "").trim()}`;
+    }
+
+    function safeValue(value) {
+      return value ? value : "-";
+    }
+
+    function renderRaceHeader(race) {
+      const header = document.getElementById("headerArea");
+
+      if (!race) {
+        header.innerHTML = "Race not found.";
+        return;
+      }
+
+      header.innerHTML = `
+        <div class="race-title">${race["Race Display"] || race["Race Name"] || ""}</div>
+        <div class="meta">Date: ${race["Date"] || ""}</div>
+        <div class="meta">Course: ${race["Course Name"] || ""}</div>
+        <div class="meta">Event ID: ${race["Event ID"] || ""}</div>
+
+        <div class="detail-grid">
+          <div class="detail-card">
+            <div class="detail-label">Type</div>
+            <div class="detail-value">${safeValue(race["Type"])}</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-label">Laps</div>
+            <div class="detail-value">${safeValue(race["Laps"])}</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-label">Distance</div>
+            <div class="detail-value">${safeValue(race["Distance"])}</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-label">Elevation</div>
+            <div class="detail-value">${safeValue(race["Elevation"])}</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-label">Sprint</div>
+            <div class="detail-value">${safeValue(race["Sprint"])}</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-label">KQOM</div>
+            <div class="detail-value">${safeValue(race["KQOM"])}</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          ${
+            race["RacePass Link"]
+              ? `<a class="btn" href="${race["RacePass Link"]}" target="_blank" rel="noopener noreferrer">Race Pass</a>`
+              : ""
+          }
+          ${
+            race["Zwiftpower Link"]
+              ? `<a class="btn secondary" href="${race["Zwiftpower Link"]}" target="_blank" rel="noopener noreferrer">ZwiftPower</a>`
+              : ""
+          }
+        </div>
+      `;
+    }
+
+    function renderResultsTable(rows) {
+      const area = document.getElementById("tableArea");
+
+      if (!rows.length) {
+        area.innerHTML = `<div class="empty">No results found.</div>`;
+        return;
+      }
+
+      area.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th class="num">Pos</th>
+              <th>Name</th>
+              <th>Competition</th>
+              <th>Cat</th>
+              <th class="num">Time</th>
+              <th class="num">Finish</th>
+              <th class="num">Sprint</th>
+              <th class="num">KOM</th>
+              <th class="num">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(r => `
+              <tr>
+                <td class="num">${r["Position"] || ""}</td>
+                <td>${r["Name"] || ""}</td>
+                <td>
+                  <span class="comp-pill ${getCompetitionClass(r["Competition"])}">
+                    ${r["Competition"] || ""}
+                  </span>
+                </td>
+                <td>
+                  <span class="cat-pill ${getCatClass(r["Cat"])}">
+                    ${r["Cat"] || ""}
+                  </span>
+                </td>
+                <td class="num">${r["Time"] || ""}</td>
+                <td class="num">${r["Finish Points"] || 0}</td>
+                <td class="num">${r["Sprint Points"] || 0}</td>
+                <td class="num">${r["KOM Points"] || 0}</td>
+                <td class="num">${r["Pts"] || 0}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function applyFilters() {
+      const q = document.getElementById("searchBox").value.trim().toLowerCase();
+      const competition = document.getElementById("competitionFilter").value;
+      const cat = document.getElementById("catFilter").value;
+
+      const filtered = allResults.filter(row => {
+        const matchesName = !q || String(row["Name"] || "").toLowerCase().includes(q);
+        const matchesCompetition = !competition || String(row["Competition"] || "") === competition;
+        const matchesCat = !cat || String(row["Cat"] || "") === cat;
+        return matchesName && matchesCompetition && matchesCat;
+      });
+
+      renderResultsTable(filtered);
+    }
+
+    function initFilters() {
+      document.getElementById("searchBox").addEventListener("input", applyFilters);
+      document.getElementById("competitionFilter").addEventListener("change", applyFilters);
+      document.getElementById("catFilter").addEventListener("change", applyFilters);
+    }
+
+    async function loadResultsPage() {
+      const raceNumber = getQueryParam("race");
+
+      if (!raceNumber) {
+        document.getElementById("headerArea").innerHTML = "Missing race parameter.";
+        document.getElementById("tableArea").innerHTML = `<div class="empty">No race selected.</div>`;
+        return;
+      }
+
+      try {
+        const data = await api("race-results", { race: raceNumber });
+
+        if (!data || data.ok === false) {
+          document.getElementById("headerArea").innerHTML = "Failed to load race.";
+          document.getElementById("tableArea").innerHTML = `<div class="empty">Failed to load results.</div>`;
+          console.error(data);
+          return;
+        }
+
+        renderRaceHeader(data.race || null);
+        allResults = data.results || [];
+        initFilters();
+        renderResultsTable(allResults);
+      } catch (err) {
+        document.getElementById("headerArea").innerHTML = "Failed to load race.";
+        document.getElementById("tableArea").innerHTML = `<div class="empty">Failed to load results.</div>`;
+        console.error(err);
+      }
+    }
+
+    loadResultsPage();
+  </script>
+</body>
+</html>
