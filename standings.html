@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MMM Standings</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0b0b0b;
+      color: white;
+    }
+
+    .top-nav {
+      background: #111;
+      border-bottom: 1px solid #222;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .top-nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .nav-logo {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 20px;
+      letter-spacing: 0.08em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      color: #ddd;
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      background: #1f1f1f;
+      color: white;
+    }
+
+    .nav-links a.active {
+      background: #e10600;
+      color: white;
+    }
+
+    #standings-app {
+      max-width: 1400px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .page-title {
+      font-size: 34px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .tab-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      background: #222;
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: #e10600;
+    }
+
+    .toolbar {
+      margin-bottom: 16px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar input,
+    .toolbar select {
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      background: white;
+      color: black;
+    }
+
+    .table-wrap {
+      background: #111;
+      color: white;
+      border-radius: 14px;
+      padding: 0;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead {
+      background: #1b1b1b;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid #2a2a2a;
+      vertical-align: middle;
+    }
+
+    th {
+      font-weight: bold;
+      color: #ddd;
+      white-space: nowrap;
+    }
+
+    tbody tr:hover {
+      background: #181818;
+    }
+
+    .num {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .comp-pill,
+    .cat-pill {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .comp-open {
+      background: #2b2b2b;
+      color: #fff;
+    }
+
+    .comp-female {
+      background: #4b2a5a;
+      color: #fff;
+    }
+
+    .cat-A { background: #8b1e1e; color: white; }
+    .cat-B { background: #1f5d2f; color: white; }
+    .cat-C { background: #1f4f7a; color: white; }
+    .cat-D { background: #8a6d1d; color: white; }
+    .cat-E { background: #666; color: white; }
+
+    .empty {
+      color: #666;
+      text-align: center;
+      padding: 30px;
+      background: white;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-nav">
+    <div class="top-nav-inner">
+      <a href="./" class="nav-logo">MMM</a>
+      <div class="nav-links">
+        <a href="./">Home</a>
+        <a href="./results-index.html">Results</a>
+        <a href="./standings.html" class="active">Standings</a>
+        <a href="./riders.html">Riders</a>
+        <a href="./rules.html">Rules</a>
+      </div>
+    </div>
+  </nav>
+
+  <div id="standings-app">
+    <div class="page-title">Standings</div>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="overall">Overall</button>
+      <button class="tab-btn" data-tab="gc">GC</button>
+      <button class="tab-btn" data-tab="sprint">Sprint</button>
+      <button class="tab-btn" data-tab="kom">KOM</button>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" id="searchBox" placeholder="Search rider name">
+      <select id="competitionFilter">
+        <option value="">All Competitions</option>
+        <option value="Open">Open</option>
+        <option value="Female">Female</option>
+      </select>
+      <select id="catFilter">
+        <option value="">All Categories</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+        <option value="E">E</option>
+      </select>
+    </div>
+
+    <div id="tableArea" class="table-wrap"></div>
+  </div>
+
+  <script src="./js/config.js"></script>
+
+  <script>
+    let standingsData = {
+      overall: [],
+      gc: [],
+      sprint: [],
+      kom: []
+    };
+
+    let currentTab = "overall";
+    let tabsInitialised = false;
+    let filtersInitialised = false;
+
+    function getCompetitionClass(value) {
+      return String(value) === "Female" ? "comp-female" : "comp-open";
+    }
+
+    function getCatClass(value) {
+      return `cat-${String(value || "").trim()}`;
+    }
+
+    function getCurrentRows() {
+      return standingsData[currentTab] || [];
+    }
+
+    function getColumnsForTab(tab, rows) {
+      const base = ["Rank", "Name", "Competition", "Cat"];
+
+      if (!rows.length) return base;
+
+      const allCols = Object.keys(rows[0]);
+      const raceCols = allCols
+        .filter(c => /^Race \d+$/i.test(c))
+        .sort((a, b) => Number(a.replace("Race ", "")) - Number(b.replace("Race ", "")));
+
+      if (tab === "gc") {
+        return [...base, ...raceCols, "Time", "Time Gap"];
+      }
+
+      if (tab === "overall") {
+        return [...base, ...raceCols, "Total Points"];
+      }
+
+      return [...base, ...raceCols, "Total Points"];
+    }
+
+    function renderTable(rows) {
+      const area = document.getElementById("tableArea");
+
+      if (!rows.length) {
+        area.innerHTML = `<div class="empty">No standings found.</div>`;
+        return;
+      }
+
+      const columns = getColumnsForTab(currentTab, rows);
+
+      area.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              ${columns.map(col => `
+                <th class="${
+                  col === 'Rank' ||
+                  col === 'Time' ||
+                  col === 'Time Gap' ||
+                  col === 'Total Points' ||
+                  /^Race \\d+$/i.test(col)
+                    ? 'num'
+                    : ''
+                }">${col}</th>
+              `).join("")}
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(r => `
+              <tr>
+                ${columns.map(col => {
+                  if (col === "Competition") {
+                    return `
+                      <td>
+                        <span class="comp-pill ${getCompetitionClass(r[col])}">
+                          ${r[col] || ""}
+                        </span>
+                      </td>
+                    `;
+                  }
+
+                  if (col === "Cat") {
+                    return `
+                      <td>
+                        <span class="cat-pill ${getCatClass(r[col])}">
+                          ${r[col] || ""}
+                        </span>
+                      </td>
+                    `;
+                  }
+
+                  const numericLike =
+                    col === "Rank" ||
+                    col === "Time" ||
+                    col === "Time Gap" ||
+                    col === "Total Points" ||
+                    /^Race \d+$/i.test(col);
+
+                  return `<td class="${numericLike ? 'num' : ''}">${r[col] || ""}</td>`;
+                }).join("")}
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function applyFilters() {
+      const q = document.getElementById("searchBox").value.trim().toLowerCase();
+      const competition = document.getElementById("competitionFilter").value;
+      const cat = document.getElementById("catFilter").value;
+
+      const filtered = getCurrentRows().filter(row => {
+        const matchesName = !q || String(row.Name || "").toLowerCase().includes(q);
+        const matchesCompetition = !competition || String(row.Competition || "") === competition;
+        const matchesCat = !cat || String(row.Cat || "") === cat;
+        return matchesName && matchesCompetition && matchesCat;
+      });
+
+      renderTable(filtered);
+    }
+
+    function initTabs() {
+      if (tabsInitialised) return;
+      tabsInitialised = true;
+
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentTab = btn.dataset.tab;
+          applyFilters();
+        });
+      });
+    }
+
+    function initFilters() {
+      if (filtersInitialised) return;
+      filtersInitialised = true;
+
+      document.getElementById("searchBox").addEventListener("input", applyFilters);
+      document.getElementById("competitionFilter").addEventListener("change", applyFilters);
+      document.getElementById("catFilter").addEventListener("change", applyFilters);
+    }
+
+    async function loadStandingsPage() {
+      try {
+        const data = await api("standings");
+
+        if (!data || data.ok === false) {
+          document.getElementById("tableArea").innerHTML =
+            `<div class="empty">Failed to load standings.</div>`;
+          console.error(data);
+          return;
+        }
+
+        standingsData = {
+          overall: data.overall || [],
+          gc: data.gc || [],
+          sprint: data.sprint || [],
+          kom: data.kom || []
+        };
+
+        initTabs();
+        initFilters();
+        renderTable(getCurrentRows());
+      } catch (err) {
+        document.getElementById("tableArea").innerHTML =
+          `<div class="empty">Failed to load standings.</div>`;
+        console.error(err);
+      }
+    }
+
+    loadStandingsPage();
+  </script>
+</body>
+</html>
