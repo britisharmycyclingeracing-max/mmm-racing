@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MMM Riders</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0b0b0b;
+      color: white;
+    }
+
+    .top-nav {
+      background: #111;
+      border-bottom: 1px solid #222;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .top-nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .nav-logo {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 20px;
+      letter-spacing: 0.08em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      color: #ddd;
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      background: #1f1f1f;
+      color: white;
+    }
+
+    .nav-links a.active {
+      background: #e10600;
+      color: white;
+    }
+
+    #riders-app {
+      max-width: 1400px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .toolbar {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar input,
+    .toolbar select {
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      background: white;
+      color: black;
+    }
+
+    .table-wrap {
+      background: #111;
+      color: white;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead {
+      background: #1b1b1b;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid #2a2a2a;
+      vertical-align: middle;
+    }
+
+    th {
+      font-weight: bold;
+      color: #ddd;
+      white-space: nowrap;
+    }
+
+    tbody tr:hover {
+      background: #181818;
+    }
+
+    .name-link {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .name-link:hover {
+      text-decoration: underline;
+    }
+
+    .medal-cell img {
+      max-height: 28px;
+      display: block;
+    }
+
+    .cat-pill,
+    .comp-pill {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .comp-open {
+      background: #2b2b2b;
+      color: #fff;
+    }
+
+    .comp-female {
+      background: #4b2a5a;
+      color: #fff;
+    }
+
+    .cat-A { background: #8b1e1e; color: white; }
+    .cat-B { background: #1f5d2f; color: white; }
+    .cat-C { background: #1f4f7a; color: white; }
+    .cat-D { background: #8a6d1d; color: white; }
+    .cat-E { background: #666; color: white; }
+
+    .num {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .empty {
+      color: #666;
+      text-align: center;
+      padding: 30px;
+      background: white;
+      border-radius: 12px;
+    }
+
+    @media (max-width: 900px) {
+      table {
+        font-size: 12px;
+      }
+
+      th, td {
+        padding: 10px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-nav">
+    <div class="top-nav-inner">
+      <a href="./" class="nav-logo">MMM</a>
+      <div class="nav-links">
+        <a href="./">Home</a>
+        <a href="./results-index.html">Results</a>
+        <a href="./standings.html">Standings</a>
+        <a href="./riders.html" class="active">Riders</a>
+        <a href="./rules.html">Rules</a>
+      </div>
+    </div>
+  </nav>
+
+  <div id="riders-app">
+    <div class="toolbar">
+      <input type="text" id="searchBox" placeholder="Search rider name">
+      <select id="competitionFilter">
+        <option value="">All Competitions</option>
+        <option value="Open">Open</option>
+        <option value="Female">Female</option>
+      </select>
+      <select id="catFilter">
+        <option value="">All Categories</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+        <option value="E">E</option>
+      </select>
+    </div>
+
+    <div id="ridersTableArea"></div>
+  </div>
+
+  <script src="./js/config.js"></script>
+
+  <script>
+    let allRiders = [];
+    let assets = {};
+    let filtersInitialised = false;
+
+    function getMedalImageUrl(rider) {
+      const medal = rider["Campaign Medal"] || "None";
+      return assets?.Medals?.[medal] || "";
+    }
+
+    function getCompetitionClass(value) {
+      return String(value) === "Female" ? "comp-female" : "comp-open";
+    }
+
+    function getCatClass(value) {
+      return `cat-${String(value || "").trim()}`;
+    }
+
+    function renderRiders(rows) {
+      const area = document.getElementById("ridersTableArea");
+
+      if (!rows.length) {
+        area.innerHTML = `<div class="empty">No riders found.</div>`;
+        return;
+      }
+
+      area.innerHTML = `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Competition</th>
+                <th>Cat</th>
+                <th>Medal</th>
+                <th class="num">Total Points</th>
+                <th class="num">GC Rank</th>
+                <th class="num">Races Completed</th>
+                <th class="num">Best Finish</th>
+                <th class="num">Sprint</th>
+                <th class="num">KOM</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map(rider => {
+                const medalUrl = getMedalImageUrl(rider);
+
+                return `
+                  <tr>
+                    <td>
+                      <a class="name-link"
+                        href="./profile.html?zwiftId=${encodeURIComponent(rider.ZwiftID)}">
+                        ${rider.Name || ""}
+                      </a>
+                    </td>
+                    <td>
+                      <span class="comp-pill ${getCompetitionClass(rider.Competition)}">
+                        ${rider.Competition || ""}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="cat-pill ${getCatClass(rider.Cat)}">
+                        ${rider.Cat || ""}
+                      </span>
+                    </td>
+                    <td class="medal-cell">
+                      ${
+                        medalUrl
+                          ? `<img src="${medalUrl}" alt="${rider["Campaign Medal"] || "Medal"}">`
+                          : (rider["Campaign Medal"] || "None")
+                      }
+                    </td>
+                    <td class="num">${rider["Total Points"] || 0}</td>
+                    <td class="num">${rider["GC Rank"] || "-"}</td>
+                    <td class="num">${rider["Races Completed"] || 0}</td>
+                    <td class="num">${rider["Best Finish"] || "-"}</td>
+                    <td class="num">${rider["Sprint Points"] || 0}</td>
+                    <td class="num">${rider["KOM Points"] || 0}</td>
+                  </tr>
+                `;
+              }).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function applyFilters() {
+      const q = document.getElementById("searchBox").value.trim().toLowerCase();
+      const competition = document.getElementById("competitionFilter").value;
+      const cat = document.getElementById("catFilter").value;
+
+      const filtered = allRiders.filter(rider => {
+        const matchesName = !q || String(rider.Name || "").toLowerCase().includes(q);
+        const matchesCompetition = !competition || String(rider.Competition || "") === competition;
+        const matchesCat = !cat || String(rider.Cat || "") === cat;
+        return matchesName && matchesCompetition && matchesCat;
+      });
+
+      renderRiders(filtered);
+    }
+
+    function initFilters() {
+      if (filtersInitialised) return;
+      filtersInitialised = true;
+
+      document.getElementById("searchBox").addEventListener("input", applyFilters);
+      document.getElementById("competitionFilter").addEventListener("change", applyFilters);
+      document.getElementById("catFilter").addEventListener("change", applyFilters);
+    }
+
+    async function loadRidersPage() {
+      try {
+        const data = await api("riders");
+
+        if (!data || data.ok === false) {
+          document.getElementById("ridersTableArea").innerHTML =
+            `<div class="empty">Failed to load riders.</div>`;
+          console.error(data);
+          return;
+        }
+
+        allRiders = data.riders || [];
+        assets = data.assets || {};
+        initFilters();
+        renderRiders(allRiders);
+      } catch (err) {
+        document.getElementById("ridersTableArea").innerHTML =
+          `<div class="empty">Failed to load riders.</div>`;
+        console.error(err);
+      }
+    }
+
+    loadRidersPage();
+  </script>
+</body>
+</html>
