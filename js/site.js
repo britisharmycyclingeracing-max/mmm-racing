@@ -29,7 +29,6 @@ function loadSiteLogo() {
       if (!logo) return;
       const nav = document.getElementById("navLogo");
       if (!nav) return;
-      nav.innerHTML = `<img src="${logo}" alt="Army Cycling" style="height:36px;">`;
     })
     .catch(() => {});
 }
