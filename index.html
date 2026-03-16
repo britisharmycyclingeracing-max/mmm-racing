@@ -84,7 +84,7 @@
     .hero p {
       margin: 0;
       font-size: 18px;
-      color: #555;
+      color: #999;
     }
 
     .panel {
@@ -356,9 +356,9 @@
 <body>
   <nav class="top-nav">
     <div class="top-nav-inner">
-      <a href="./home.html" class="nav-logo">MMM</a>
+      <a href="./" class="nav-logo">MMM</a>
       <div class="nav-links">
-        <a href="./home.html" class="active">Home</a>
+        <a href="./" class="active">Home</a>
         <a href="./results-index.html">Results</a>
         <a href="./standings.html">Standings</a>
         <a href="./riders.html">Riders</a>
@@ -580,8 +580,9 @@
 
   </div>
 
+  <script src="./js/config.js"></script>
+
   <script>
-    const API_BASE = "https://script.google.com/macros/s/AKfycbyXmaCTP9hMKVMZzfsGc73W8jEatq0M5pKP6Wg1X6olc-r1uCDHTSvzj5RZNSFk9qxvPA/exec";
 
     function setLeader(nameId, subId, row, mode) {
       const nameEl = document.getElementById(nameId);
@@ -773,8 +774,7 @@
 
     async function loadHomePage() {
       try {
-        const res = await fetch(`${API_BASE}?api=home`);
-        const data = await res.json();
+        const data = await api("home");
         renderHomePage(data);
       } catch (err) {
         document.getElementById("siteTitle").innerText = "Failed to load data";
