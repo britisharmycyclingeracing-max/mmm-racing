@@ -8,9 +8,62 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: transparent;
+      background: #0b0b0b;
+      color: white;
     }
-
+    
+    .top-nav {
+      background: #111;
+      border-bottom: 1px solid #222;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    
+    .top-nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    
+    .nav-logo {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 20px;
+      letter-spacing: 0.08em;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .nav-links a {
+      color: #ddd;
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    
+    .nav-links a:hover {
+      background: #1f1f1f;
+      color: white;
+    }
+    
+    .nav-links a.active {
+      background: #e10600;
+      color: white;
+    }
+    
     #mmm-home {
       max-width: 1100px;
       margin: auto;
@@ -20,6 +73,7 @@
     .hero {
       text-align: center;
       margin-bottom: 30px;
+      margin-top: 10px;
     }
 
     .hero h1 {
@@ -300,6 +354,18 @@
   </style>
 </head>
 <body>
+  <nav class="top-nav">
+    <div class="top-nav-inner">
+      <a href="./home.html" class="nav-logo">MMM</a>
+      <div class="nav-links">
+        <a href="./home.html" class="active">Home</a>
+        <a href="./results-index.html">Results</a>
+        <a href="./standings.html">Standings</a>
+        <a href="./riders.html">Riders</a>
+        <a href="./rules.html">Rules</a>
+      </div>
+    </div>
+  </nav>
   <div id="mmm-home">
 
     <div class="hero">
