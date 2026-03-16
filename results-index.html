@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MMM Results</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0b0b0b;
+      color: white;
+    }
+
+    .top-nav {
+      background: #111;
+      border-bottom: 1px solid #222;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .top-nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .nav-logo {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 20px;
+      letter-spacing: 0.08em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      color: #ddd;
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      background: #1f1f1f;
+      color: white;
+    }
+
+    .nav-links a.active {
+      background: #e10600;
+      color: white;
+    }
+
+    #results-index-app {
+      max-width: 1400px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .page-title {
+      font-size: 34px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .page-subtitle {
+      color: #999;
+      margin-bottom: 24px;
+    }
+
+    .campaign-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 18px;
+    }
+
+    .race-card {
+      background: #111;
+      color: white;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .race-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.22);
+    }
+
+    .race-card.complete {
+      border: 1px solid rgba(80, 200, 120, 0.35);
+    }
+
+    .race-card.next {
+      border: 2px solid rgba(225, 6, 0, 0.9);
+      box-shadow: 0 0 0 1px rgba(225, 6, 0, 0.35), 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    .race-card.upcoming {
+      opacity: 0.88;
+    }
+
+    .week-pill {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: #222;
+      color: #fff;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 5px 9px;
+      border-radius: 999px;
+    }
+
+    .visual-row {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .badge-wrap {
+      background: #1b1b1b;
+      border-radius: 10px;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 110px;
+    }
+
+    .badge-wrap img {
+      width: 85px;
+      height: 85px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .route-map {
+      background: #1b1b1b;
+      border-radius: 10px;
+      padding: 10px 10px 18px 10px;
+      text-align: center;
+      position: relative;
+      min-height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .route-map img {
+      width: 100%;
+      max-width: 180px;
+      height: auto;
+      display: block;
+    }
+
+    .route-credit {
+      position: absolute;
+      bottom: 3px;
+      left: 0;
+      right: 0;
+      font-size: 9px;
+      color: #888;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .route-credit a {
+      color: #aaa;
+      text-decoration: none;
+    }
+
+    .route-credit a:hover {
+      text-decoration: underline;
+    }
+
+    .visual-placeholder {
+      color: #777;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .race-name {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .meta {
+      color: #ccc;
+      margin-bottom: 6px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 14px;
+      margin-bottom: 10px;
+    }
+
+    .meta-box {
+      background: #1b1b1b;
+      border-radius: 8px;
+      padding: 8px 10px;
+      text-align: center;
+    }
+
+    .meta-box .label {
+      font-size: 11px;
+      color: #999;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .meta-box .value {
+      font-size: 14px;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .status {
+      display: inline-block;
+      margin: 12px auto 14px auto;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      background: #2b2b2b;
+    }
+
+    .status-wrap {
+      text-align: center;
+    }
+
+    .status.complete {
+      background: #1f5d2f;
+      color: white;
+    }
+
+    .status.next {
+      background: #8a6d1d;
+      color: white;
+    }
+
+    .status.upcoming {
+      background: #2b2b2b;
+      color: white;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .btn {
+      display: inline-block;
+      background: #e10600;
+      color: white;
+      text-decoration: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .btn.secondary {
+      background: #333;
+    }
+
+    .empty {
+      color: #666;
+      text-align: center;
+      padding: 30px;
+    }
+
+    @media (max-width: 600px) {
+      .visual-row {
+        grid-template-columns: 1fr;
+      }
+
+      .badge-wrap img {
+        width: 70px;
+        height: 70px;
+      }
+
+      .route-map img {
+        max-width: 220px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-nav">
+    <div class="top-nav-inner">
+      <a href="./" class="nav-logo">MMM</a>
+      <div class="nav-links">
+        <a href="./">Home</a>
+        <a href="./results-index.html" class="active">Results</a>
+        <a href="./standings.html">Standings</a>
+        <a href="./riders.html">Riders</a>
+        <a href="./rules.html">Rules</a>
+      </div>
+    </div>
+  </nav>
+
+  <div id="results-index-app">
+    <div class="page-title">2026 Campaign</div>
+    <div class="page-subtitle">Track each stage of Monday Military Madness</div>
+    <div id="resultsGrid" class="campaign-grid"></div>
+  </div>
+
+  <script src="./js/config.js"></script>
+
+  <script>
+    function getStatusClass(status) {
+      const s = String(status || "").toLowerCase();
+      if (s === "complete") return "complete";
+      if (s === "next") return "next";
+      return "upcoming";
+    }
+
+    function getBadgeUrl(race, assets) {
+      const key = race["Race Name"] || race["Stage Name"] || "";
+      return assets?.Badges?.[key] || "";
+    }
+
+    function getRouteMap(courseName, assets) {
+      if (!courseName) return "";
+      return assets?.RouteMaps?.[courseName] || "";
+    }
+
+    function safeValue(value) {
+      return value ? value : "-";
+    }
+
+    function renderResultsIndex(data) {
+      if (!data || data.ok === false) {
+        document.getElementById("resultsGrid").innerHTML =
+          `<div class="empty">Failed to load race cards.</div>`;
+        console.error(data);
+        return;
+      }
+
+      const races = data.races || [];
+      const assets = data.assets || {};
+      const grid = document.getElementById("resultsGrid");
+
+      if (!races.length) {
+        grid.innerHTML = `<div class="empty">No races found.</div>`;
+        return;
+      }
+
+      grid.innerHTML = races.map(r => {
+        const badgeUrl = getBadgeUrl(r, assets);
+        const routeMap = getRouteMap(r["Course Name"], assets);
+        const statusClass = getStatusClass(r["Status"]);
+
+        return `
+          <div class="race-card ${statusClass}">
+            <div class="week-pill">Week ${r["Week"] || ""}</div>
+
+            <div class="visual-row">
+              <div class="badge-wrap">
+                ${
+                  badgeUrl
+                    ? `<img src="${badgeUrl}" alt="${r["Race Display"] || r["Race Name"] || ""}">`
+                    : `<div class="visual-placeholder">No badge</div>`
+                }
+              </div>
+
+              <div class="route-map">
+                ${
+                  routeMap
+                    ? `
+                      <img src="${routeMap}" alt="${r["Course Name"] || "Route map"}">
+                      <div class="route-credit">
+                        Map:
+                        <a href="https://zwiftinsider.com" target="_blank" rel="noopener noreferrer">ZwiftInsider</a> /
+                        <a href="https://zwifthacks.com" target="_blank" rel="noopener noreferrer">ZwiftHacks</a>
+                      </div>
+                    `
+                    : `<div class="visual-placeholder">No map</div>`
+                }
+              </div>
+            </div>
+
+            <div class="race-name">${r["Race Display"] || r["Race Name"] || ""}</div>
+            <div class="meta">${r["Course Name"] || ""}</div>
+            <div class="meta">${r["Date"] || ""}</div>
+
+            <div class="meta-grid">
+              <div class="meta-box">
+                <div class="label">Type</div>
+                <div class="value">${safeValue(r["Type"])}</div>
+              </div>
+              <div class="meta-box">
+                <div class="label">Laps</div>
+                <div class="value">${safeValue(r["Laps"])}</div>
+              </div>
+              <div class="meta-box">
+                <div class="label">Distance</div>
+                <div class="value">${safeValue(r["Distance"])}</div>
+              </div>
+              <div class="meta-box">
+                <div class="label">Elevation</div>
+                <div class="value">${safeValue(r["Elevation"])}</div>
+              </div>
+              <div class="meta-box">
+                <div class="label">Sprint</div>
+                <div class="value">${safeValue(r["Sprint"])}</div>
+              </div>
+              <div class="meta-box">
+                <div class="label">KQOM</div>
+                <div class="value">${safeValue(r["KQOM"])}</div>
+              </div>
+            </div>
+
+            <div class="status-wrap">
+              <span class="status ${statusClass}">${r["Status"] || "Upcoming"}</span>
+            </div>
+
+            <div class="actions">
+              ${
+                String(r["Status"] || "").toLowerCase() === "complete"
+                  ? `<a class="btn" href="./results.html?race=${encodeURIComponent(r["Week"])}">
+                      View Results
+                    </a>`
+                  : (r["RacePass Link"]
+                      ? `<a class="btn" href="${r["RacePass Link"]}" target="_blank" rel="noopener noreferrer">
+                          ${String(r["Status"] || "").toLowerCase() === "next" ? "Join Next Race" : "Race Pass"}
+                        </a>`
+                      : "")
+              }
+
+              ${
+                String(r["Status"] || "").toLowerCase() === "complete" && r["Zwiftpower Link"]
+                  ? `<a class="btn secondary" href="${r["Zwiftpower Link"]}" target="_blank" rel="noopener noreferrer">
+                      ZwiftPower
+                    </a>`
+                  : ""
+              }
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function loadResultsIndexPage() {
+      try {
+        const data = await api("race-cards");
+        renderResultsIndex(data);
+      } catch (err) {
+        document.getElementById("resultsGrid").innerHTML =
+          `<div class="empty">Failed to load race cards.</div>`;
+        console.error(err);
+      }
+    }
+
+    loadResultsIndexPage();
+  </script>
+</body>
+</html>
