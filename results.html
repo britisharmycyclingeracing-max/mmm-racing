@@ -4,66 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MMM Race Results</title>
+  <link rel="stylesheet" href="./css/site.css">
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b0b0b;
-      color: white;
-    }
-
-    .top-nav {
-      background: #111;
-      border-bottom: 1px solid #222;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-
-    .top-nav-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-    }
-
-    .nav-logo {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 20px;
-      letter-spacing: 0.08em;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .nav-links a {
-      color: #ddd;
-      text-decoration: none;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: bold;
-      transition: background 0.2s ease, color 0.2s ease;
-    }
-
-    .nav-links a:hover {
-      background: #1f1f1f;
-      color: white;
-    }
-
-    .nav-links a.active {
-      background: #e10600;
-      color: white;
-    }
-
     #results-app {
       max-width: 1400px;
       margin: auto;
@@ -72,11 +14,14 @@
 
     .header-card,
     .table-wrap {
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .header-card {
       background: #111;
       color: white;
       border-radius: 14px;
-      padding: 20px;
-      margin-bottom: 20px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
 
@@ -123,116 +68,21 @@
       flex-wrap: wrap;
       margin-top: 14px;
     }
-
-    .btn {
-      display: inline-block;
-      background: #e10600;
-      color: white;
-      text-decoration: none;
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 14px;
-    }
-
-    .btn.secondary {
-      background: #333;
-    }
-
-    .toolbar {
-      margin-bottom: 16px;
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .toolbar input,
-    .toolbar select {
-      padding: 10px 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 14px;
-      background: white;
-      color: black;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-
-    thead {
-      background: #1b1b1b;
-    }
-
-    th, td {
-      padding: 12px 10px;
-      text-align: left;
-      border-bottom: 1px solid #2a2a2a;
-      vertical-align: middle;
-    }
-
-    th {
-      font-weight: bold;
-      color: #ddd;
-      white-space: nowrap;
-    }
-
-    tbody tr:hover {
-      background: #181818;
-    }
-
-    .num {
-      text-align: right;
-      white-space: nowrap;
-    }
-
-    .comp-pill,
-    .cat-pill {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: bold;
-    }
-
-    .comp-open {
-      background: #2b2b2b;
-      color: #fff;
-    }
-
-    .comp-female {
-      background: #4b2a5a;
-      color: #fff;
-    }
-
-    .cat-A { background: #8b1e1e; color: white; }
-    .cat-B { background: #1f5d2f; color: white; }
-    .cat-C { background: #1f4f7a; color: white; }
-    .cat-D { background: #8a6d1d; color: white; }
-    .cat-E { background: #666; color: white; }
-
-    .empty {
-      color: #666;
-      text-align: center;
-      padding: 30px;
-    }
   </style>
 </head>
 <body>
- <nav class="top-nav">
+  <nav class="top-nav">
     <div class="top-nav-inner">
       <a href="./" class="nav-logo">MMM</a>
       <div class="nav-links">
         <a href="./" id="nav-home">Home</a>
-        <a href="./results-index.html" id="nav-results">Campaign & Results</a>
+        <a href="./results-index.html" id="nav-results">Results</a>
         <a href="./standings.html" id="nav-standings">Standings</a>
         <a href="./riders.html" id="nav-riders">Riders</a>
         <a href="./rules.html" id="nav-rules">Rules</a>
       </div>
     </div>
- </nav>
+  </nav>
 
   <div id="results-app">
     <div id="headerArea" class="header-card">Loading race...</div>
@@ -258,9 +108,11 @@
   </div>
 
   <script src="./js/config.js"></script>
+  <script src="./js/site.js"></script>
 
   <script>
     let allResults = [];
+    let filtersInitialised = false;
 
     function getQueryParam(name) {
       return new URLSearchParams(window.location.search).get(name);
@@ -400,6 +252,9 @@
     }
 
     function initFilters() {
+      if (filtersInitialised) return;
+      filtersInitialised = true;
+
       document.getElementById("searchBox").addEventListener("input", applyFilters);
       document.getElementById("competitionFilter").addEventListener("change", applyFilters);
       document.getElementById("catFilter").addEventListener("change", applyFilters);
