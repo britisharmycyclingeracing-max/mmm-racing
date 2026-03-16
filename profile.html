@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MMM Rider Profile</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0b0b0b;
+      color: white;
+    }
+
+    .top-nav {
+      background: #111;
+      border-bottom: 1px solid #222;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .top-nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .nav-logo {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 20px;
+      letter-spacing: 0.08em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      color: #ddd;
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      background: #1f1f1f;
+      color: white;
+    }
+
+    .nav-links a.active {
+      background: #e10600;
+      color: white;
+    }
+
+    #profile-app {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .header-card,
+    .section-card {
+      background: #111;
+      color: white;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .rider-name {
+      font-size: 34px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .rider-meta {
+      color: #ccc;
+      margin-bottom: 14px;
+    }
+
+    .medal img {
+      max-height: 52px;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .stat {
+      background: #1b1b1b;
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .stat-label {
+      color: #aaa;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .ribbons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .ribbon {
+      text-align: center;
+    }
+
+    .ribbon img {
+      max-width: 100%;
+      max-height: 70px;
+      display: block;
+      margin: 0 auto 6px auto;
+    }
+
+    .ribbon-label {
+      font-size: 12px;
+      color: #ccc;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid #333;
+      font-size: 14px;
+    }
+
+    th {
+      color: #aaa;
+      font-weight: bold;
+    }
+
+    .empty {
+      color: #666;
+      text-align: center;
+      padding: 30px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-nav">
+    <div class="top-nav-inner">
+      <a href="./" class="nav-logo">MMM</a>
+      <div class="nav-links">
+        <a href="./">Home</a>
+        <a href="./results-index.html">Results</a>
+        <a href="./standings.html">Standings</a>
+        <a href="./riders.html" class="active">Riders</a>
+        <a href="./rules.html">Rules</a>
+      </div>
+    </div>
+  </nav>
+
+  <div id="profile-app">
+    <div id="profileContent" class="empty">Loading rider profile...</div>
+  </div>
+
+  <script src="./js/config.js"></script>
+
+  <script>
+    const STAGES = [
+      "OpeningBattle",
+      "BreakawayMayhem",
+      "SummerSiege",
+      "HeatwaveHammer",
+      "Attrition",
+      "FinalPush",
+      "LastStand"
+    ];
+
+    function getQueryParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+
+    function isTrue(value) {
+      return String(value).toUpperCase() === "TRUE";
+    }
+
+    function stageNameToDisplay(name) {
+      return String(name || "")
+        .replace(/([a-z])([A-Z])/g, "$1 $2")
+        .replace(/_/g, " ")
+        .trim();
+    }
+
+    function getMedalImageUrl(rider, assets) {
+      const medal = rider["Campaign Medal"] || "None";
+      return assets?.Medals?.[medal] || "";
+    }
+
+    function getRibbonImageUrl(stage, rider, assets) {
+      const completed = isTrue(rider[stage]);
+      const key = completed ? `${stage}_On` : `${stage}_Off`;
+      return assets?.Ribbons?.[key] || "";
+    }
+
+    function renderProfile(data) {
+      const rider = data.rider;
+      const history = data.history || [];
+      const assets = data.assets || {};
+      const el = document.getElementById("profileContent");
+
+      if (!rider) {
+        el.className = "empty";
+        el.innerHTML = "Rider not found.";
+        return;
+      }
+
+      const medalUrl = getMedalImageUrl(rider, assets);
+
+      const ribbonsHtml = STAGES.map(stage => {
+        const img = getRibbonImageUrl(stage, rider, assets);
+        return `
+          <div class="ribbon">
+            ${img ? `<img src="${img}" alt="${stage}">` : ""}
+            <div class="ribbon-label">${stageNameToDisplay(stage)}</div>
+          </div>
+        `;
+      }).join("");
+
+      const historyHtml = history.length
+        ? `
+          <table>
+            <thead>
+              <tr>
+                <th>Race</th>
+                <th>Position</th>
+                <th>Time</th>
+                <th>Points</th>
+                <th>Sprint</th>
+                <th>KOM</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${history.map(r => `
+                <tr>
+                  <td>${r["Race Name"] || ""}</td>
+                  <td>${r["Position"] || ""}</td>
+                  <td>${r["Time"] || ""}</td>
+                  <td>${r["Points"] || ""}</td>
+                  <td>${r["Sprint Points"] || ""}</td>
+                  <td>${r["KOM Points"] || ""}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        `
+        : `<div class="empty">No race history found.</div>`;
+
+      el.className = "";
+      el.innerHTML = `
+        <div class="header-card">
+          <div class="rider-name">${rider.Name || ""}</div>
+          <div class="rider-meta">
+            ${rider.Competition || ""}${rider.Cat ? " • " + rider.Cat : ""}
+          </div>
+
+          <div class="medal">
+            ${medalUrl
+              ? `<img src="${medalUrl}" alt="${rider["Campaign Medal"] || "Medal"}">`
+              : `<div>${rider["Campaign Medal"] || "None"}</div>`
+            }
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat">
+              <div class="stat-label">Total Points</div>
+              <div>${rider["Total Points"] || 0}</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">GC Rank</div>
+              <div>${rider["GC Rank"] || "-"}</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Races Completed</div>
+              <div>${rider["Races Completed"] || 0}</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Best Finish</div>
+              <div>${rider["Best Finish"] || "-"}</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Sprint Points</div>
+              <div>${rider["Sprint Points"] || 0}</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">KOM Points</div>
+              <div>${rider["KOM Points"] || 0}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <h2>Campaign Progress</h2>
+          <div class="ribbons">
+            ${ribbonsHtml}
+          </div>
+        </div>
+
+        <div class="section-card">
+          <h2>Race History</h2>
+          ${historyHtml}
+        </div>
+      `;
+    }
+
+    async function loadProfilePage() {
+      const zwiftId = getQueryParam("zwiftId");
+
+      if (!zwiftId) {
+        document.getElementById("profileContent").innerText = "Missing zwiftId parameter.";
+        return;
+      }
+
+      try {
+        const data = await api("profile", { zwiftId });
+
+        if (!data || data.ok === false) {
+          document.getElementById("profileContent").innerText = "Failed to load rider profile.";
+          console.error(data);
+          return;
+        }
+
+        renderProfile(data);
+      } catch (err) {
+        document.getElementById("profileContent").innerText = "Failed to load rider profile.";
+        console.error(err);
+      }
+    }
+
+    loadProfilePage();
+  </script>
+</body>
+</html>
