@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monday Military Madness</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: transparent;
+    }
+
+    #mmm-home {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px 0;
+      font-size: 42px;
+    }
+
+    .hero p {
+      margin: 0;
+      font-size: 18px;
+      color: #555;
+    }
+
+    .panel {
+      background: #111;
+      color: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+
+    .panel p {
+      color: #ddd;
+      line-height: 1.6;
+    }
+
+    .rules-list {
+      margin: 0;
+      padding-left: 20px;
+      color: #ddd;
+      line-height: 1.7;
+    }
+
+    .rules-list li {
+      margin-bottom: 8px;
+    }
+
+    .btn {
+      display: inline-block;
+      margin-top: 12px;
+      background: #e10600;
+      padding: 10px 14px;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+
+    .btn.secondary-btn {
+      background: #333;
+    }
+
+    .muted {
+      color: #aaa;
+    }
+
+    .next-race-layout {
+      display: grid;
+      grid-template-columns: 130px 240px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .next-race-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #1b1b1b;
+      border-radius: 12px;
+      padding: 12px;
+      min-height: 140px;
+    }
+
+    .next-race-map {
+      background: #1b1b1b;
+      border-radius: 12px;
+      padding: 12px 12px 22px 12px;
+      min-height: 140px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .next-race-badge img {
+      width: 110px;
+      height: 110px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .next-race-map img {
+      width: 100%;
+      max-width: 210px;
+      height: auto;
+      display: block;
+    }
+
+    .next-race-placeholder {
+      color: #777;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .route-credit {
+      position: absolute;
+      bottom: 4px;
+      left: 0;
+      right: 0;
+      font-size: 9px;
+      color: #888;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .route-credit a {
+      color: #999;
+      text-decoration: none;
+    }
+
+    .route-credit a:hover {
+      text-decoration: underline;
+    }
+
+    .next-race-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .meta-card {
+      background: #1b1b1b;
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .meta-label {
+      font-size: 12px;
+      color: #aaa;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .meta-value {
+      font-size: 15px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .leaders-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 20px;
+    }
+
+    .leader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0;
+      font-size: 16px;
+      background: #1b1b1b;
+      padding: 10px 12px;
+      border-radius: 8px;
+    }
+
+    .leader-label {
+      color: #bbb;
+    }
+
+    .leader-value {
+      text-align: right;
+    }
+
+    .leader-name {
+      font-weight: bold;
+    }
+
+    .leader-sub {
+      font-size: 12px;
+      color: #888;
+      margin-top: 2px;
+    }
+
+    .category-table-wrap {
+      overflow-x: auto;
+    }
+
+    .category-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .category-table th,
+    .category-table td {
+      padding: 10px 8px;
+      border-bottom: 1px solid #2a2a2a;
+      text-align: left;
+    }
+
+    .category-table th {
+      color: #bbb;
+      font-weight: bold;
+    }
+
+    .category-table td:first-child {
+      font-weight: bold;
+      color: white;
+    }
+
+    @media (max-width: 900px) {
+      .leaders-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .next-race-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .next-race-badge,
+      .next-race-map {
+        min-height: auto;
+      }
+
+      .next-race-badge img {
+        width: 100px;
+        height: 100px;
+      }
+
+      .next-race-map img {
+        max-width: 260px;
+      }
+    }
+
+    .podium-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .podium-card {
+      background: #1b1b1b;
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .podium-pos {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .podium-name {
+      font-weight: bold;
+    }
+
+    .podium-sub {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 700px) {
+      .podium-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="mmm-home">
+
+    <div class="hero">
+      <h1 id="siteTitle">Loading...</h1>
+      <p id="campaignProgress" class="muted"></p>
+    </div>
+
+    <div class="panel">
+      <h2>About the Series</h2>
+      <p>
+        Monday Military Madness is a seven-stage community Zwift race series, with a new battlefield every month.
+        Each round brings a different test, from flatter, faster racing to harder courses where positioning,
+        pacing and timing matter.
+      </p>
+      <p>
+        The series is designed to be competitive, accessible and fun, giving riders the chance to fight for
+        overall points, GC, sprint honours and K/QOM rewards across the campaign. Whether you are racing for
+        the podium or just turning up for the challenge, every stage adds to the story.
+      </p>
+    </div>
+
+    <div class="panel">
+      <h2>Quick Rules</h2>
+      <ul class="rules-list">
+        <li>Monday Military Madness is a community event and open to all riders unless otherwise stated.</li>
+        <li>Riders must enter the correct category or pen for each event.</li>
+        <li>Race cards show the official format, laps, distance, elevation, sprint and K/QOM details for each round.</li>
+        <li>Official results and standings are published after each event.</li>
+        <li>Riders are expected to race fairly and in good spirit at all times.</li>
+        <li>The organiser may review and amend results where needed to protect fair competition.</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>Next Race</h2>
+
+      <div class="next-race-layout">
+        <div class="next-race-badge" id="nextRaceBadgeWrap">
+          <div class="next-race-placeholder">No badge</div>
+        </div>
+
+        <div class="next-race-map" id="nextRaceMapWrap">
+          <div class="next-race-placeholder">No map</div>
+        </div>
+
+        <div>
+          <div id="nextRaceName"></div>
+          <div id="nextRaceDate" class="muted"></div>
+          <div id="nextRaceCourse" class="muted"></div>
+
+          <div class="next-race-meta">
+            <div class="meta-card">
+              <div class="meta-label">Type</div>
+              <div class="meta-value" id="nextRaceType">-</div>
+            </div>
+            <div class="meta-card">
+              <div class="meta-label">Laps</div>
+              <div class="meta-value" id="nextRaceLaps">-</div>
+            </div>
+            <div class="meta-card">
+              <div class="meta-label">Distance</div>
+              <div class="meta-value" id="nextRaceDistance">-</div>
+            </div>
+            <div class="meta-card">
+              <div class="meta-label">Elevation</div>
+              <div class="meta-value" id="nextRaceElevation">-</div>
+            </div>
+            <div class="meta-card">
+              <div class="meta-label">Sprint</div>
+              <div class="meta-value" id="nextRaceSprint">-</div>
+            </div>
+            <div class="meta-card">
+              <div class="meta-label">KQOM</div>
+              <div class="meta-value" id="nextRaceKQOM">-</div>
+            </div>
+          </div>
+
+          <a id="racePassLink" class="btn" target="_blank" href="#">Join Race</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Last Race Podium</h2>
+      <div id="podiumWrap" class="podium-grid"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Current Leaders</h2>
+
+      <div class="leaders-grid">
+        <div class="leader">
+          <div class="leader-label">Overall Open</div>
+          <div class="leader-value">
+            <div class="leader-name" id="overallOpenLeader"></div>
+            <div class="leader-sub" id="overallOpenLeaderSub"></div>
+          </div>
+        </div>
+
+        <div class="leader">
+          <div class="leader-label">Overall Female</div>
+          <div class="leader-value">
+            <div class="leader-name" id="overallFemaleLeader"></div>
+            <div class="leader-sub" id="overallFemaleLeaderSub"></div>
+          </div>
+        </div>
+
+        <div class="leader">
+          <div class="leader-label">GC Open</div>
+          <div class="leader-value">
+            <div class="leader-name" id="gcOpenLeader"></div>
+            <div class="leader-sub" id="gcOpenLeaderSub"></div>
+          </div>
+        </div>
+
+        <div class="leader">
+          <div class="leader-label">GC Female</div>
+          <div class="leader-value">
+            <div class="leader-name" id="gcFemaleLeader"></div>
+            <div class="leader-sub" id="gcFemaleLeaderSub"></div>
+          </div>
+        </div>
+
+        <div class="leader">
+          <div class="leader-label">Sprint Open</div>
+          <div class="leader-value">
+            <div class="leader-name" id="sprintOpenLeader"></div>
+            <div class="leader-sub" id="sprintOpenLeaderSub"></div>
+          </div>
+        </div>
+
+        <div class="leader">
+          <div class="leader-label">Sprint Female</div>
+          <div class="leader-value">
+            <div class="leader-name" id="sprintFemaleLeader"></div>
+            <div class="leader-sub" id="sprintFemaleLeaderSub"></div>
+          </div>
+        </div>
+
+        <div class="leader">
+          <div class="leader-label">KOM Open</div>
+          <div class="leader-value">
+            <div class="leader-name" id="komOpenLeader"></div>
+            <div class="leader-sub" id="komOpenLeaderSub"></div>
+          </div>
+        </div>
+
+        <div class="leader">
+          <div class="leader-label">KOM Female</div>
+          <div class="leader-value">
+            <div class="leader-name" id="komFemaleLeader"></div>
+            <div class="leader-sub" id="komFemaleLeaderSub"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Category Leaders</h2>
+
+      <div class="category-table-wrap">
+        <table class="category-table">
+          <thead>
+            <tr>
+              <th>Cat</th>
+              <th>Overall</th>
+              <th>GC</th>
+              <th>Sprint</th>
+              <th>KOM</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A</td>
+              <td id="catAOverall"></td>
+              <td id="catAGC"></td>
+              <td id="catASprint"></td>
+              <td id="catAKOM"></td>
+            </tr>
+            <tr>
+              <td>B</td>
+              <td id="catBOverall"></td>
+              <td id="catBGC"></td>
+              <td id="catBSprint"></td>
+              <td id="catBKOM"></td>
+            </tr>
+            <tr>
+              <td>C</td>
+              <td id="catCOverall"></td>
+              <td id="catCGC"></td>
+              <td id="catCSprint"></td>
+              <td id="catCKOM"></td>
+            </tr>
+            <tr>
+              <td>D</td>
+              <td id="catDOverall"></td>
+              <td id="catDGC"></td>
+              <td id="catDSprint"></td>
+              <td id="catDKOM"></td>
+            </tr>
+            <tr>
+              <td>E</td>
+              <td id="catEOverall"></td>
+              <td id="catEGC"></td>
+              <td id="catESprint"></td>
+              <td id="catEKOM"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_BASE = "YOUR_APPS_SCRIPT_WEBAPP_URL_HERE";
+
+    function setLeader(nameId, subId, row, mode) {
+      const nameEl = document.getElementById(nameId);
+      const subEl = document.getElementById(subId);
+
+      if (!row) {
+        nameEl.innerText = "-";
+        subEl.innerText = "";
+        return;
+      }
+
+      nameEl.innerText = row.Name || "-";
+
+      if (mode === "time") {
+        subEl.innerText = row["Time"] || "";
+      } else {
+        subEl.innerText = row["Total Points"] ? `${row["Total Points"]} pts` : "";
+      }
+    }
+
+    function setCategoryLeader(cellId, row, mode) {
+      const el = document.getElementById(cellId);
+      if (!el) return;
+
+      if (!row) {
+        el.innerText = "-";
+        return;
+      }
+
+      if (mode === "time") {
+        el.innerText = `${row.Name || "-"}${row["Time"] ? ` (${row["Time"]})` : ""}`;
+      } else {
+        el.innerText = `${row.Name || "-"}${row["Total Points"] ? ` (${row["Total Points"]})` : ""}`;
+      }
+    }
+
+    function setText(id, value) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.innerText = value ? value : "-";
+    }
+
+    function getBadgeUrl(race, assets) {
+      if (!race || !assets) return "";
+      const key = race["Race Name"] || race["Stage Name"] || "";
+      return assets?.Badges?.[key] || "";
+    }
+
+    function getRouteMap(courseName, assets) {
+      if (!courseName || !assets) return "";
+      return assets?.RouteMaps?.[courseName] || "";
+    }
+
+    function renderNextRaceBadge(race, assets) {
+      const wrap = document.getElementById("nextRaceBadgeWrap");
+      if (!wrap) return;
+
+      const badgeUrl = getBadgeUrl(race, assets);
+
+      if (badgeUrl) {
+        const alt = race?.["Race Display"] || race?.["Race Name"] || "Race badge";
+        wrap.innerHTML = `<img src="${badgeUrl}" alt="${alt}">`;
+      } else {
+        wrap.innerHTML = `<div class="next-race-placeholder">No badge</div>`;
+      }
+    }
+
+    function renderNextRaceMap(race, assets) {
+      const wrap = document.getElementById("nextRaceMapWrap");
+      if (!wrap) return;
+
+      const mapUrl = getRouteMap(race?.["Course Name"], assets);
+
+      if (mapUrl) {
+        const alt = race?.["Course Name"] || "Route map";
+        wrap.innerHTML = `
+          <img src="${mapUrl}" alt="${alt}">
+          <div class="route-credit">
+            Map:
+            <a href="https://zwiftinsider.com" target="_blank" rel="noopener noreferrer">ZwiftInsider</a> /
+            <a href="https://zwifthacks.com" target="_blank" rel="noopener noreferrer">ZwiftHacks</a>
+          </div>
+        `;
+      } else {
+        wrap.innerHTML = `<div class="next-race-placeholder">No map</div>`;
+      }
+    }
+
+    function renderCategoryLeaders(leaders) {
+      setCategoryLeader("catAOverall", leaders.overall?.cats?.A, "points");
+      setCategoryLeader("catAGC", leaders.gc?.cats?.A, "time");
+      setCategoryLeader("catASprint", leaders.sprint?.cats?.A, "points");
+      setCategoryLeader("catAKOM", leaders.kom?.cats?.A, "points");
+
+      setCategoryLeader("catBOverall", leaders.overall?.cats?.B, "points");
+      setCategoryLeader("catBGC", leaders.gc?.cats?.B, "time");
+      setCategoryLeader("catBSprint", leaders.sprint?.cats?.B, "points");
+      setCategoryLeader("catBKOM", leaders.kom?.cats?.B, "points");
+
+      setCategoryLeader("catCOverall", leaders.overall?.cats?.C, "points");
+      setCategoryLeader("catCGC", leaders.gc?.cats?.C, "time");
+      setCategoryLeader("catCSprint", leaders.sprint?.cats?.C, "points");
+      setCategoryLeader("catCKOM", leaders.kom?.cats?.C, "points");
+
+      setCategoryLeader("catDOverall", leaders.overall?.cats?.D, "points");
+      setCategoryLeader("catDGC", leaders.gc?.cats?.D, "time");
+      setCategoryLeader("catDSprint", leaders.sprint?.cats?.D, "points");
+      setCategoryLeader("catDKOM", leaders.kom?.cats?.D, "points");
+
+      setCategoryLeader("catEOverall", leaders.overall?.cats?.E, "points");
+      setCategoryLeader("catEGC", leaders.gc?.cats?.E, "time");
+      setCategoryLeader("catESprint", leaders.sprint?.cats?.E, "points");
+      setCategoryLeader("catEKOM", leaders.kom?.cats?.E, "points");
+    }
+
+    function renderPodium(podium) {
+      const wrap = document.getElementById("podiumWrap");
+      if (!wrap) return;
+
+      if (!podium || !podium.length) {
+        wrap.innerHTML = `<div class="next-race-placeholder">No completed race yet</div>`;
+        return;
+      }
+
+      wrap.innerHTML = podium.map((r, i) => `
+        <div class="podium-card">
+          <div class="podium-pos">${i + 1}</div>
+          <div class="podium-name">${r["Name"] || "-"}</div>
+          <div class="podium-sub">${r["Time"] || ""}</div>
+        </div>
+      `).join("");
+    }
+
+    function renderHomePage(data) {
+      if (!data || data.ok === false) {
+        document.getElementById("siteTitle").innerText = "Failed to load data";
+        console.error(data);
+        return;
+      }
+
+      const panels = data.panels || {};
+      const leaders = data.leaders || {};
+      const assets = data.assets || {};
+      const nextRace = data.nextRace || null;
+
+      document.getElementById("siteTitle").innerText =
+        panels.Hero?.SiteTitle || "Monday Military Madness";
+
+      document.getElementById("campaignProgress").innerText =
+        panels.Hero?.CampaignProgress || "";
+
+      document.getElementById("nextRaceName").innerText =
+        panels.NextRace?.RaceName || "";
+
+      document.getElementById("nextRaceDate").innerText =
+        panels.NextRace?.Date ? `Date: ${panels.NextRace.Date}` : "";
+
+      document.getElementById("nextRaceCourse").innerText =
+        panels.NextRace?.Course ? `Course: ${panels.NextRace.Course}` : "";
+
+      setText("nextRaceType", panels.NextRace?.Type || "");
+      setText("nextRaceLaps", panels.NextRace?.Laps || "");
+      setText("nextRaceDistance", panels.NextRace?.Distance || "");
+      setText("nextRaceElevation", panels.NextRace?.Elevation || "");
+      setText("nextRaceSprint", panels.NextRace?.Sprint || "");
+      setText("nextRaceKQOM", panels.NextRace?.KQOM || "");
+
+      renderNextRaceBadge(nextRace, assets);
+      renderNextRaceMap(nextRace, assets);
+
+      const raceLink = document.getElementById("racePassLink");
+      raceLink.href = panels.NextRace?.RacePass || "#";
+
+      setLeader("overallOpenLeader", "overallOpenLeaderSub", leaders.overall?.open, "points");
+      setLeader("overallFemaleLeader", "overallFemaleLeaderSub", leaders.overall?.female, "points");
+
+      setLeader("gcOpenLeader", "gcOpenLeaderSub", leaders.gc?.open, "time");
+      setLeader("gcFemaleLeader", "gcFemaleLeaderSub", leaders.gc?.female, "time");
+
+      setLeader("sprintOpenLeader", "sprintOpenLeaderSub", leaders.sprint?.open, "points");
+      setLeader("sprintFemaleLeader", "sprintFemaleLeaderSub", leaders.sprint?.female, "points");
+
+      setLeader("komOpenLeader", "komOpenLeaderSub", leaders.kom?.open, "points");
+      setLeader("komFemaleLeader", "komFemaleLeaderSub", leaders.kom?.female, "points");
+
+      renderCategoryLeaders(leaders);
+      renderPodium(data.podium || []);
+    }
+
+    async function loadHomePage() {
+      try {
+        const res = await fetch(`${API_BASE}?api=home`);
+        const data = await res.json();
+        renderHomePage(data);
+      } catch (err) {
+        document.getElementById("siteTitle").innerText = "Failed to load data";
+        console.error(err);
+      }
+    }
+
+    loadHomePage();
+  </script>
+</body>
+</html>
