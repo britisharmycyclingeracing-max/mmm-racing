@@ -19,4 +19,22 @@ function setActiveNav() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", setActiveNav);
+function loadSiteLogo() {
+
+  if (typeof api !== "function") return;
+
+  api("home")
+    .then(data => {
+      const logo = data?.assets?.SiteLogo;
+      if (!logo) return;
+      const nav = document.getElementById("navLogo");
+      if (!nav) return;
+      nav.innerHTML = `<img src="${logo}" alt="Army Cycling" style="height:36px;">`;
+    })
+    .catch(() => {});
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  setActiveNav();
+  loadSiteLogo();
+});
