@@ -20,15 +20,20 @@ function setActiveNav() {
 }
 
 function loadSiteLogo() {
-
   if (typeof api !== "function") return;
 
   api("home")
     .then(data => {
+      if (!data || data.ok === false) return;
+
       const logo = data?.assets?.UI?.SiteLogo;
       if (!logo) return;
-      const nav = document.getElementById("navLogo");
+
+      const nav = document.getElementById("navLogoImg");
       if (!nav) return;
+
+      nav.src = logo;
+      nav.alt = "Army Cycling";
     })
     .catch(() => {});
 }
