@@ -5,6 +5,12 @@ body {
   color: white;
 }
 
+.nav-logo img{
+  display:block;
+  height:36px;
+  width:auto;
+}
+
 .top-nav {
   background: #111;
   border-bottom: 1px solid #222;
