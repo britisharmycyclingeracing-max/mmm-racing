@@ -1,24 +1,26 @@
 # mmm-racing
-Monday Military Madness Racing
 
-MMM Racing Site
+# Monday Military Madness Racing Site
 
-Frontend: GitHub Pages
-Backend: Google Apps Script API
-Database: Google Sheets
+Frontend: GitHub Pages  
+Backend: Google Apps Script API  
+Database: Google Sheets  
 
-API endpoints:
-?api=home
-?api=race-cards
-?api=race-results
-?api=standings
-?api=riders
-?api=profile
+## Pages
 
-Main pages:
-index.html
-results-index.html
-results.html
-standings.html
-riders.html
-profile.html
+index.html — Home dashboard  
+results-index.html — Campaign overview  
+results.html — Individual race results  
+standings.html — Overall standings  
+riders.html — Rider directory  
+profile.html — Rider profile  
+rules.html — Series rules
+
+## API Endpoints
+
+api=home  
+api=race-cards  
+api=race-results  
+api=standings  
+api=riders  
+api=profile
