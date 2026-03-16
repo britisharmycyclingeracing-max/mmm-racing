@@ -3,6 +3,7 @@ body {
   font-family: Arial, sans-serif;
   background: #0b0b0b;
   color: white;
+  overflow-x: hidden;
 }
 
 .nav-logo{
@@ -192,12 +193,22 @@ tbody tr:hover {
   color: black;
 }
 
+table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
 .table-wrap {
   background: #111;
   color: white;
   border-radius: 14px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  max-width: 100%;
 }
 
 .page-title {
