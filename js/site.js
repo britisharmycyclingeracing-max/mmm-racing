@@ -25,7 +25,7 @@ function loadSiteLogo() {
 
   api("home")
     .then(data => {
-      const logo = data?.assets?.SiteLogo;
+      const logo = data?.assets?.UI?.SiteLogo;
       if (!logo) return;
       const nav = document.getElementById("navLogo");
       if (!nav) return;
