@@ -293,6 +293,37 @@
       color: white;
     }
 
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 16px;
+      background: #1b1b1b;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #e10600, #ff5a4f);
+      border-radius: 999px;
+      transition: width 0.5s ease;
+    }
+    
+    .progress-subtext {
+      margin-top: 10px;
+      color: #aaa;
+      font-size: 14px;
+    }
+
     @media (max-width: 900px) {
       .leaders-grid {
         grid-template-columns: 1fr;
@@ -371,6 +402,18 @@
     <div class="hero">
       <h1 id="siteTitle">Loading...</h1>
       <p id="campaignProgress" class="muted"></p>
+    </div>
+
+    <div class="panel">
+      <h2>Campaign Progress</h2>
+      <div class="progress-meta">
+        <div id="campaignStatusText">Loading progress...</div>
+        <div id="campaignPercentText">0%</div>
+      </div>
+      <div class="progress-bar">
+        <div id="campaignProgressFill" class="progress-fill"></div>
+      </div>
+      <div id="campaignNextStage" class="progress-subtext"></div>
     </div>
 
     <div class="panel">
@@ -716,6 +759,33 @@
       `).join("");
     }
 
+    function renderCampaignProgress(campaign) {
+      const statusEl = document.getElementById("campaignStatusText");
+      const percentEl = document.getElementById("campaignPercentText");
+      const fillEl = document.getElementById("campaignProgressFill");
+      const nextStageEl = document.getElementById("campaignNextStage");
+    
+      if (!campaign) {
+        statusEl.innerText = "Progress unavailable";
+        percentEl.innerText = "";
+        fillEl.style.width = "0%";
+        nextStageEl.innerText = "";
+        return;
+      }
+    
+      statusEl.innerText = campaign.statusText || "";
+      percentEl.innerText = `${campaign.percentComplete || 0}%`;
+      fillEl.style.width = `${campaign.percentComplete || 0}%`;
+    
+      if (campaign.remainingStages === 0) {
+        nextStageEl.innerText = "Campaign complete.";
+      } else if (campaign.nextStageNumber) {
+        nextStageEl.innerText = `Next stage: ${campaign.nextStageNumber}`;
+      } else {
+        nextStageEl.innerText = `${campaign.remainingStages} stages remaining`;
+      }
+    }
+
     function renderHomePage(data) {
       if (!data || data.ok === false) {
         document.getElementById("siteTitle").innerText = "Failed to load data";
@@ -727,6 +797,8 @@
       const leaders = data.leaders || {};
       const assets = data.assets || {};
       const nextRace = data.nextRace || null;
+
+      renderCampaignProgress(data.campaign || null);
 
       document.getElementById("siteTitle").innerText =
         panels.Hero?.SiteTitle || "Monday Military Madness";
