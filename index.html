@@ -254,6 +254,36 @@
       font-size: 14px;
     }
 
+        .campaign-map-panel h2 {
+      margin-bottom: 12px;
+    }
+
+    .campaign-map-intro {
+      color: #bbb;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    .campaign-map-wrap {
+      background: #0d0d0d;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #222;
+    }
+
+    .campaign-map-image {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .campaign-map-note {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #999;
+      text-align: center;
+    }
+
     @media (max-width: 900px) {
       .leaders-grid {
         grid-template-columns: 1fr;
@@ -321,6 +351,26 @@
         <div id="campaignProgressFill" class="progress-fill"></div>
       </div>
       <div id="campaignNextStage" class="progress-subtext"></div>
+    </div>
+
+    <div class="panel campaign-map-panel">
+      <h2>Campaign Map</h2>
+      <p class="campaign-map-intro">
+        Track the 2026 campaign route across all seven objectives. Completed stages, the current objective,
+        and upcoming battles will be highlighted here as the series progresses.
+      </p>
+
+      <div class="campaign-map-wrap">
+        <img
+          src="./assets/campaign/mmm-2026-campaign-map.jpg"
+          alt="Monday Military Madness 2026 campaign map"
+          class="campaign-map-image"
+        >
+      </div>
+
+      <div class="campaign-map-note">
+        The live interactive campaign map is coming soon.
+      </div>
     </div>
 
     <div class="panel">
