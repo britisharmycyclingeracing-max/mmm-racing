@@ -254,6 +254,36 @@
       font-size: 14px;
     }
 
+    .notice-list {
+      display: grid;
+      gap: 12px;
+    }
+    
+    .notice-card {
+      background: #1b1b1b;
+      border-left: 4px solid #e10600;
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+    
+    .notice-title {
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: white;
+    }
+    
+    .notice-message {
+      color: #ddd;
+      line-height: 1.5;
+      white-space: pre-line;
+    }
+    
+    .notice-updated {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #999;
+    }
+
     @media (max-width: 900px) {
       .leaders-grid {
         grid-template-columns: 1fr;
@@ -309,6 +339,11 @@
     <div class="hero">
       <h1 id="siteTitle">Loading...</h1>
       <p id="campaignProgress" class="muted"></p>
+    </div>
+
+    <div class="panel" id="raceControlPanel" style="display:none;">
+      <h2>Race Control Notices</h2>
+      <div id="raceControlNotices"></div>
     </div>
 
     <div class="panel">
@@ -779,7 +814,43 @@
       }
     }
 
+    function renderRaceControlNotices(data) {
+      const panel = document.getElementById("raceControlPanel");
+      const wrap = document.getElementById("raceControlNotices");
+    
+      if (!panel || !wrap) return;
+    
+      if (!data || data.ok === false || !data.notices || !data.notices.length) {
+        panel.style.display = "none";
+        return;
+      }
+    
+      panel.style.display = "block";
+    
+      wrap.innerHTML = `
+        <div class="notice-list">
+          ${data.notices.map(notice => `
+            <div class="notice-card">
+              <div class="notice-title">${notice.title || "Notice"}</div>
+              <div class="notice-message">${notice.message || ""}</div>
+              ${notice.lastUpdated ? `<div class="notice-updated">Updated: ${notice.lastUpdated}</div>` : ""}
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+    
+    async function loadRaceControlNotices() {
+      try {
+        const data = await api("race-control-notices");
+        renderRaceControlNotices(data);
+      } catch (err) {
+        console.error("Failed to load race control notices", err);
+      }
+    }
+
     loadHomePage();
+    loadRaceControlNotices();
   </script>
 </body>
 </html>
