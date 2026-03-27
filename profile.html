@@ -92,6 +92,62 @@
     .section-card th {
       color: #aaa;
     }
+    .rank-card {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: #1b1b1b;
+      border-radius: 12px;
+      padding: 16px;
+      margin: 18px 0 6px 0;
+    }
+    
+    .rank-badge {
+      width: 88px;
+      height: 88px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    
+    .rank-info {
+      flex: 1;
+    }
+    
+    .rank-label {
+      color: #aaa;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+    
+    .rank-name {
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 6px;
+    }
+    
+    .rank-progress-text {
+      color: #ccc;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    
+    .rank-progress-bar {
+      width: 100%;
+      max-width: 320px;
+      height: 10px;
+      background: #2a2a2a;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    
+    .rank-progress-fill {
+      height: 100%;
+      background: #e10600;
+      border-radius: 999px;
+    }
   </style>
 </head>
 <body>
@@ -158,6 +214,22 @@
       return assets?.Ribbons?.[key] || "";
     }
 
+    function getRankFromRacesCompleted(count) {
+      const races = Math.max(0, Math.min(Number(count) || 0, 7));
+  
+      const ranks = {
+        0: { name: "Rider", short: "Unranked", image: "./assets/ranks/Rider.png" },
+        1: { name: "Rider", short: "Rank 1", image: "./assets/ranks/Rider.png" },
+        2: { name: "Breakaway", short: "Rank 2", image: "./assets/ranks/Breakaway.png" },
+        3: { name: "Sergeant", short: "Rank 3", image: "../assets/ranks/Sergeant.png" },
+        4: { name: "Road Captain", short: "Rank 4", image: "../assets/ranks/Road-Captain.png" },
+        5: { name: "Elite Rider", short: "Rank 5", image: "./assets/ranks/Elite-Rider.png.png" },
+        6: { name: "Specialist", short: "Rank 6", image: "./assets/ranks/Specialist.png" },
+        7: { name: "War Machine", short: "Rank 7", image: "./assets/ranks/War-Machine.png" }
+      };
+  
+      return ranks[races] || ranks[0];
+
     function renderProfile(data) {
       const rider = data.rider;
       const history = data.history || [];
@@ -171,6 +243,9 @@
       }
 
       const medalUrl = getMedalImageUrl(rider, assets);
+      const racesCompleted = Number(rider["Races Completed"]) || 0;
+      const rank = getRankFromRacesCompleted(racesCompleted);
+      const rankProgress = Math.max(0, Math.min((racesCompleted / 7) * 100, 100));
 
       const ribbonsHtml = STAGES.map(stage => {
         const img = getRibbonImageUrl(stage, rider, assets);
@@ -224,6 +299,18 @@
               ? `<img src="${medalUrl}" alt="${rider["Campaign Medal"] || "Medal"}">`
               : `<div>${rider["Campaign Medal"] || "None"}</div>`
             }
+          </div>
+          
+          <div class="rank-card">
+            ${rank.image ? `<img class="rank-badge" src="${rank.image}" alt="${rank.name} badge">` : ""}
+            <div class="rank-info">
+              <div class="rank-label">Current Rank</div>
+              <div class="rank-name">${rank.name}</div>
+              <div class="rank-progress-text">${racesCompleted} / 7 races completed</div>
+              <div class="rank-progress-bar">
+                <div class="rank-progress-fill" style="width: ${rankProgress}%"></div>
+              </div>
+            </div>
           </div>
 
           <div class="stats-grid">
