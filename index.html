@@ -284,6 +284,74 @@
       color: #999;
     }
 
+    .rank-panel-intro {
+      color: #ddd;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+    
+    .rank-ladder {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(120px, 1fr));
+      gap: 12px;
+    }
+    
+    .rank-ladder-card {
+      background: #1b1b1b;
+      border-radius: 12px;
+      padding: 14px 10px;
+      text-align: center;
+      border: 1px solid #2a2a2a;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .rank-ladder-card:hover {
+      transform: translateY(-3px);
+      border-color: #444;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    }
+    
+    .rank-ladder-badge {
+      width: 78px;
+      height: 78px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 10px auto;
+    }
+    
+    .rank-ladder-name {
+      font-size: 14px;
+      font-weight: bold;
+      color: #fff;
+      line-height: 1.35;
+      min-height: 38px;
+    }
+    
+    .rank-ladder-stage {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #999;
+    }
+    
+    .rank-ladder-note {
+      margin-top: 14px;
+      font-size: 13px;
+      color: #aaa;
+      text-align: center;
+    }
+    
+    @media (max-width: 1100px) {
+      .rank-ladder {
+        grid-template-columns: repeat(4, minmax(120px, 1fr));
+      }
+    }
+    
+    @media (max-width: 700px) {
+      .rank-ladder {
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+      }
+    }
+
     @media (max-width: 900px) {
       .leaders-grid {
         grid-template-columns: 1fr;
@@ -390,6 +458,63 @@
         overall points, GC, sprint honours and K/QOM rewards across the campaign. Whether you are racing for
         the podium or just turning up for the challenge, every stage adds to the story.
       </p>
+    </div>
+
+    <div class="panel">
+      <h2>Campaign Ranks</h2>
+      <p class="rank-panel-intro">
+        Monday Military Madness includes a campaign rank structure based on races completed.
+        Each stage you finish moves you further up the ladder, giving every rider a visible
+        campaign progression across the seven-race season.
+      </p>
+    
+      <div class="rank-ladder">
+        <div class="rank-ladder-card">
+          <img class="rank-ladder-badge" src="./assets/ranks/Rider.png" alt="Rider badge">
+          <div class="rank-ladder-name">Rider</div>
+          <div class="rank-ladder-stage">1 race completed</div>
+        </div>
+    
+        <div class="rank-ladder-card">
+          <img class="rank-ladder-badge" src="./assets/ranks/Breakaway.png" alt="Breakaway badge">
+          <div class="rank-ladder-name">Breakaway</div>
+          <div class="rank-ladder-stage">2 races completed</div>
+        </div>
+    
+        <div class="rank-ladder-card">
+          <img class="rank-ladder-badge" src="./assets/ranks/Sergeant.png" alt="Sergeant badge">
+          <div class="rank-ladder-name">Sergeant</div>
+          <div class="rank-ladder-stage">3 races completed</div>
+        </div>
+    
+        <div class="rank-ladder-card">
+          <img class="rank-ladder-badge" src="./assets/ranks/Road-Captain.png" alt="Road Captain badge">
+          <div class="rank-ladder-name">Road Captain</div>
+          <div class="rank-ladder-stage">4 races completed</div>
+        </div>
+    
+        <div class="rank-ladder-card">
+          <img class="rank-ladder-badge" src="./assets/ranks/Elite-Rider.png" alt="Elite Rider badge">
+          <div class="rank-ladder-name">Elite Rider</div>
+          <div class="rank-ladder-stage">5 races completed</div>
+        </div>
+    
+        <div class="rank-ladder-card">
+          <img class="rank-ladder-badge" src="./assets/ranks/Specialist.png" alt="Specialist badge">
+          <div class="rank-ladder-name">Specialist</div>
+          <div class="rank-ladder-stage">6 races completed</div>
+        </div>
+    
+        <div class="rank-ladder-card">
+          <img class="rank-ladder-badge" src="./assets/ranks/War-Machine.png" alt="War Machine badge">
+          <div class="rank-ladder-name">War Machine</div>
+          <div class="rank-ladder-stage">7 races completed</div>
+        </div>
+      </div>
+    
+      <div class="rank-ladder-note">
+        Rank progression is based on campaign participation and appears on rider profiles.
+      </div>
     </div>
 
     <div class="panel">
