@@ -184,13 +184,16 @@
               : ""
           }
           ${
+            race["YouTube Link"]
+              ? `<a class="btn secondary" href="${race["YouTube Link"]}" target="_blank" rel="noopener noreferrer">Watch Live</a>`
+              : ""
+          }
+          ${
             race["Zwiftpower Link"]
               ? `<a class="btn secondary" href="${race["Zwiftpower Link"]}" target="_blank" rel="noopener noreferrer">ZwiftPower</a>`
               : ""
           }
         </div>
-      `;
-    }
 
     function renderResultsTable(rows) {
       const area = document.getElementById("tableArea");
