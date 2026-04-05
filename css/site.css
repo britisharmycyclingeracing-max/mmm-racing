@@ -107,6 +107,14 @@ body {
   font-size: 14px;
 }
 
+.btn.live {
+  background: #cc0000;
+}
+
+.btn.live:hover {
+  background: #e10600;
+}
+
 .btn.secondary {
   background: #333;
 }
