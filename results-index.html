@@ -374,7 +374,15 @@
                         </a>`
                       : "")
               }
-
+            
+              ${
+                r["YouTube Link"]
+                  ? `<a class="btn secondary" href="${r["YouTube Link"]}" target="_blank" rel="noopener noreferrer">
+                      Watch Live
+                    </a>`
+                  : ""
+              }
+            
               ${
                 String(r["Status"] || "").toLowerCase() === "complete" && r["Zwiftpower Link"]
                   ? `<a class="btn secondary" href="${r["Zwiftpower Link"]}" target="_blank" rel="noopener noreferrer">
