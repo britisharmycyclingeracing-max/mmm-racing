@@ -573,7 +573,12 @@
             </div>
           </div>
 
-          <a id="racePassLink" class="btn" target="_blank" rel="noopener noreferrer" href="#">Join Race</a>
+          <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+            <a id="racePassLink" class="btn" target="_blank" rel="noopener noreferrer" href="#">Join Race</a>
+            <a id="watchLiveLink" class="btn secondary" target="_blank" rel="noopener noreferrer" href="#" style="display:none;">
+              Watch Live
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -912,6 +917,17 @@
 
       const raceLink = document.getElementById("racePassLink");
       raceLink.href = panels.NextRace?.RacePass || "#";
+
+      const watchLiveLink = document.getElementById("watchLiveLink");
+      const youtubeLink = panels.NextRace?.YouTubeLink || "";
+      
+      if (youtubeLink) {
+        watchLiveLink.href = youtubeLink;
+        watchLiveLink.style.display = "inline-block";
+      } else {
+        watchLiveLink.href = "#";
+        watchLiveLink.style.display = "none";
+      }
 
       setLeader("overallOpenLeader", "overallOpenLeaderSub", leaders.overall?.open, "points");
       setLeader("overallFemaleLeader", "overallFemaleLeaderSub", leaders.overall?.female, "points");
