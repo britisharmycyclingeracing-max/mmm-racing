@@ -119,37 +119,37 @@
   <script>
     let allResults = [];
     let filtersInitialised = false;
-
+  
     function getQueryParam(name) {
       return new URLSearchParams(window.location.search).get(name);
     }
-
+  
     function getCompetitionClass(value) {
       return String(value) === "Female" ? "comp-female" : "comp-open";
     }
-
+  
     function getCatClass(value) {
       return `cat-${String(value || "").trim()}`;
     }
-
+  
     function safeValue(value) {
       return value ? value : "-";
     }
-
+  
     function renderRaceHeader(race) {
       const header = document.getElementById("headerArea");
-
+  
       if (!race) {
         header.innerHTML = "Race not found.";
         return;
       }
-
+  
       header.innerHTML = `
         <div class="race-title">${race["Race Display"] || race["Race Name"] || ""}</div>
         <div class="meta">Date: ${race["Date"] || ""}</div>
         <div class="meta">Course: ${race["Course Name"] || ""}</div>
         <div class="meta">Event ID: ${race["Event ID"] || ""}</div>
-
+  
         <div class="detail-grid">
           <div class="detail-card">
             <div class="detail-label">Type</div>
@@ -176,7 +176,7 @@
             <div class="detail-value">${safeValue(race["KQOM"])}</div>
           </div>
         </div>
-
+  
         <div class="actions">
           ${
             race["RacePass Link"]
@@ -194,15 +194,17 @@
               : ""
           }
         </div>
-
+      `;
+    }
+  
     function renderResultsTable(rows) {
       const area = document.getElementById("tableArea");
-
+  
       if (!rows.length) {
         area.innerHTML = `<div class="empty">No results found.</div>`;
         return;
       }
-
+  
       area.innerHTML = `
         <table>
           <thead>
@@ -244,50 +246,50 @@
         </table>
       `;
     }
-
+  
     function applyFilters() {
       const q = document.getElementById("searchBox").value.trim().toLowerCase();
       const competition = document.getElementById("competitionFilter").value;
       const cat = document.getElementById("catFilter").value;
-
+  
       const filtered = allResults.filter(row => {
         const matchesName = !q || String(row["Name"] || "").toLowerCase().includes(q);
         const matchesCompetition = !competition || String(row["Competition"] || "") === competition;
         const matchesCat = !cat || String(row["Cat"] || "") === cat;
         return matchesName && matchesCompetition && matchesCat;
       });
-
+  
       renderResultsTable(filtered);
     }
-
+  
     function initFilters() {
       if (filtersInitialised) return;
       filtersInitialised = true;
-
+  
       document.getElementById("searchBox").addEventListener("input", applyFilters);
       document.getElementById("competitionFilter").addEventListener("change", applyFilters);
       document.getElementById("catFilter").addEventListener("change", applyFilters);
     }
-
+  
     async function loadResultsPage() {
       const raceNumber = getQueryParam("race");
-
+  
       if (!raceNumber) {
         document.getElementById("headerArea").innerHTML = "Missing race parameter.";
         document.getElementById("tableArea").innerHTML = `<div class="empty">No race selected.</div>`;
         return;
       }
-
+  
       try {
         const data = await api("race-results", { race: raceNumber });
-
+  
         if (!data || data.ok === false) {
           document.getElementById("headerArea").innerHTML = "Failed to load race.";
           document.getElementById("tableArea").innerHTML = `<div class="empty">Failed to load results.</div>`;
           console.error(data);
           return;
         }
-
+  
         renderRaceHeader(data.race || null);
         allResults = data.results || [];
         initFilters();
@@ -298,7 +300,7 @@
         console.error(err);
       }
     }
-
+  
     loadResultsPage();
   </script>
 </body>
